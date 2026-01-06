@@ -23,6 +23,8 @@ namespace PetBrain
             switch (d.type)
             {
                 case FindDecisionType.Search:
+                    if (!string.IsNullOrEmpty(d.preEmoji))
+                        tempPetMove.QueueShowEmojiCommand(d.preEmoji, d.preEmojiDuration);
                     Debug.Log($"[Dispatcher] FIND/Search: {d.destination} ({d.note})");
                     tempPetMove.QueueSearchCommand(d.destination);
                     break;

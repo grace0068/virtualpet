@@ -29,6 +29,8 @@ namespace PetBrain
         public bool IsActive => _active;
         public string TargetLabel => _targetLabelNorm;
 
+        bool _didPreMoveEmoji;
+
         public void BeginFind(string targetLabel, global::SceneSnapshot snapshot)
         {
             _active = true;
@@ -37,6 +39,8 @@ namespace PetBrain
             _searchHistory.Clear();
 
             _targetLabelNorm = NormalizeLabel(targetLabel);
+
+            _didPreMoveEmoji = false;
 
             _knownAtStart = TryFindInMemory(snapshot, _targetLabelNorm, out _);
             Debug.Log($"[FindCoordinator] BeginFind label='{targetLabel}' norm='{_targetLabelNorm}' knownAtStart={_knownAtStart}");
@@ -80,7 +84,12 @@ namespace PetBrain
                         _movedToKnown = true;
                         _attempts++;
                         _searchHistory.Add(knownPos);
-                        return FindDecision.Search(knownPos, "go to known location confidently");
+                        if (!_didPreMoveEmoji) _didPreMoveEmoji = true;
+
+                        return FindDecision.Search(knownPos, "go to known location confidently",
+                            preEmoji: "😄",
+                            preEmojiDuration: 2.0f
+                        );
                     }
 
                     // fallback: if memory missing unexpectedly
@@ -103,7 +112,15 @@ namespace PetBrain
             var next = PickLeastExploredPoint(snapshot, petPos);
             _attempts++;
             _searchHistory.Add(next);
-            return FindDecision.Search(next, $"explore attempt {_attempts}/{maxAttempts}");
+            string pre = null;
+            if (!_didPreMoveEmoji)
+            {
+                pre = "🤔"; // 갸우뚱/고민 느낌 (원하면 😕 / ❓로 바꿔도 됨)
+                _didPreMoveEmoji = true;
+            }
+
+            return FindDecision.Search(next, $"explore attempt {_attempts}/{maxAttempts}", preEmoji: pre, preEmojiDuration: 2.0f);
+
         }
 
         Vector3 PickLeastExploredPoint(global::SceneSnapshot snapshot, Vector3 petPos)

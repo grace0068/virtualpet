@@ -32,6 +32,13 @@ namespace PetBrain
             StartCoroutine(WaitRoutine("objectnotfound", defaultActionSeconds));
         }
 
+        public void QueueShowEmojiCommand(string emoji, float duration = 2.5f)
+        {
+            Debug.Log($"[PetMoveTemp] showemoji {emoji} for {duration:0.0}s");
+            // 네 temp 구현이 “큐 기반 + 일정 시간 후 ActionFinished 이벤트”라면
+            // 여기서도 같은 큐에 넣어 duration만큼 실행되도록 처리하면 됨.
+        }
+
         public void QueueDebugAction(string action, float durationSeconds)
         {
             if (_busy) return;
