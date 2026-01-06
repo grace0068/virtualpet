@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI; // ✅ 추가
 
 namespace PetBrain
 {
@@ -11,6 +12,11 @@ namespace PetBrain
         public float candidateRadiusMax = 4.0f;
         public int candidatesPerStep = 10;
         public float exploredNeighborhoodRadius = 2.0f;
+
+        // ✅ NavMesh 관련 (최소 추가)
+        public bool useNavMesh = true;
+        public float navMeshSnapDistance = 1.2f;
+        public float navMeshSnapDistanceForKnownPos = 2.0f;
 
         bool _active;
         string _targetLabelNorm;
@@ -67,6 +73,10 @@ namespace PetBrain
                 {
                     if (TryFindInMemory(snapshot, _targetLabelNorm, out var knownPos))
                     {
+                        // ✅ knownPos도 NavMesh 위로 스냅 시도 (최소 추가)
+                        if (useNavMesh && TryProjectToNavMesh(knownPos, navMeshSnapDistanceForKnownPos, out var snappedKnown))
+                            knownPos = snappedKnown;
+
                         _movedToKnown = true;
                         _attempts++;
                         _searchHistory.Add(knownPos);
@@ -112,12 +122,27 @@ namespace PetBrain
             Vector3 best = petPos + new Vector3(0, 0, 2f);
             float bestScore = float.MaxValue;
 
+            bool foundAnyValid = false;
+
             for (int i = 0; i < candidatesPerStep; i++)
             {
                 float r = UnityEngine.Random.Range(candidateRadiusMin, candidateRadiusMax);
                 float ang = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
+
                 var cand = petPos + new Vector3(Mathf.Cos(ang) * r, 0f, Mathf.Sin(ang) * r);
                 cand.y = petPos.y;
+
+                // ✅ (1) NavMesh 위로 스냅 + (2) 경로 유효성 체크 (최소 핵심 추가)
+                if (useNavMesh)
+                {
+                    if (!TryProjectToNavMesh(cand, navMeshSnapDistance, out var snapped))
+                        continue;
+
+                    if (!HasCompletePath(petPos, snapped))
+                        continue;
+
+                    cand = snapped; // 스냅된 좌표를 최종 후보로 사용
+                }
 
                 // score = how many memory anchors are nearby (lower => less explored)
                 float score = 0f;
@@ -139,10 +164,35 @@ namespace PetBrain
                 {
                     bestScore = score;
                     best = cand;
+                    foundAnyValid = true;
                 }
             }
 
+            // ✅ NavMesh 후보를 하나도 못 찾았으면 기존 방식의 fallback (그대로)
+            if (!foundAnyValid)
+                return petPos + new Vector3(0, 0, 2f);
+
             return best;
+        }
+
+        // ✅ NavMesh helper들 (최소 추가)
+        static bool TryProjectToNavMesh(Vector3 pos, float maxDistance, out Vector3 snapped)
+        {
+            snapped = pos;
+            if (NavMesh.SamplePosition(pos, out var hit, maxDistance, NavMesh.AllAreas))
+            {
+                snapped = hit.position;
+                return true;
+            }
+            return false;
+        }
+
+        static bool HasCompletePath(Vector3 from, Vector3 to)
+        {
+            var path = new NavMeshPath();
+            if (!NavMesh.CalculatePath(from, to, NavMesh.AllAreas, path))
+                return false;
+            return path.status == NavMeshPathStatus.PathComplete;
         }
 
         static bool TryFindInVisible(global::SceneSnapshot snapshot, string labelNorm, out Vector3 pos)
