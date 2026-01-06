@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a8dafd30901eaae4486c273963194cad
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 247465
+  packageName: DOG Full Animations - Brittany Spaniel
+  packageVersion: 1.0
+  assetPath: Assets/Dog_BrittanySpaniel/Animator/BrittanySpaniel_3.controller
+  uploadId: 564114
