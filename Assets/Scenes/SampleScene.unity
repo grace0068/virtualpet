@@ -9272,8 +9272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ef69e4215a76334eb64a758874ccf62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MRUKAnchorProvider
-  currentRoomOnly: 1
-  excludeGlobalMesh: 1
+  currentRoomOnly: 0
 --- !u!114 &570478508
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9287,6 +9286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionService
   currentMode: 1
+  petRoot: {fileID: 1808079897}
   petCamera: {fileID: 56189406}
   anchorProviderBehaviour: {fileID: 570478507}
   occlusionMode: 1
@@ -11263,6 +11263,7 @@ GameObject:
   - component: {fileID: 720483205}
   - component: {fileID: 720483204}
   - component: {fileID: 720483203}
+  - component: {fileID: 720483206}
   m_Layer: 0
   m_Name: PetRoot
   m_TagString: Untagged
@@ -11330,6 +11331,21 @@ Transform:
   - {fileID: 424890361}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &720483206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 720483202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aad7e355b1d2734aaf5db93dc61ee24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PetBrain.PetMoveTemp
+  defaultActionSeconds: 3
+  searchSpeed: 1
+  foundSpeed: 2.5
 --- !u!1 &723341494
 GameObject:
   m_ObjectHideFlags: 0
@@ -18086,6 +18102,72 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1172746031}
   m_CullTransparentMesh: 1
+--- !u!1 &1173875290
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1173875293}
+  - component: {fileID: 1173875292}
+  - component: {fileID: 1173875291}
+  m_Layer: 0
+  m_Name: PetBrain
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1173875291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173875290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c38e13d4ff3a01498b3489b5fc51d43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PetBrain.PetBrainOrchestrator
+  perception: {fileID: 570478508}
+  dispatcher: {fileID: 1173875292}
+  llmBridgeBehaviour: {fileID: 1987321904}
+  userInputFileName: UserInput.txt
+  maxCommandsPerCycle: 5
+  enableLLM: 1
+  findMaxAttempts: 6
+--- !u!114 &1173875292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173875290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ca3718159157f6429bd240a14e58aac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PetBrain.PetActionDispatcher
+  tempPetMove: {fileID: 720483206}
+  forceTemp: 1
+--- !u!4 &1173875293
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173875290}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1182734566
 GameObject:
   m_ObjectHideFlags: 0
@@ -28264,6 +28346,52 @@ Transform:
   - {fileID: 68297392}
   m_Father: {fileID: 1218432885}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1987321903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1987321905}
+  - component: {fileID: 1987321904}
+  m_Layer: 0
+  m_Name: OllamaLLMBridge
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1987321904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1987321903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1761a9c29d5a7cd4b97885d9a09acea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OllamaLLMBridge
+  baseUrl: http://localhost:11434
+  model: llama3.2
+--- !u!4 &1987321905
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1987321903}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1994710861
 GameObject:
   m_ObjectHideFlags: 0
@@ -29836,3 +29964,5 @@ SceneRoots:
   - {fileID: 1261252577}
   - {fileID: 1839183827}
   - {fileID: 570478509}
+  - {fileID: 1173875293}
+  - {fileID: 1987321905}
